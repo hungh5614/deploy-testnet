@@ -1,449 +1,161 @@
 // Yêu cầu thư viện ethers từ hardhat
-const { ethers } = require('hardhat')
+const { ethers } = require("hardhat");
 
 async function main() {
-  
-  // Địa chỉ hợp đồng token và ABI
-  const tokenAddress = '0x422672531186d9C0a86b7D6E565186972975459D'
+  // Địa chỉ hợp đồng WBNB và ABI
+  const tokenAddress = "0xae13d989dac2f0debff460ac112a837c89baa7cd";
 
   const tokenABI = [
     {
-      inputs: [
+      constant: true,
+      inputs: [],
+      name: "name",
+      outputs: [
         {
-          internalType: 'uint256',
-          name: 'initialSupply',
-          type: 'uint256',
+          name: "",
+          type: "string",
         },
       ],
-      stateMutability: 'nonpayable',
-      type: 'constructor',
+      payable: false,
+      stateMutability: "view",
+      type: "function",
     },
     {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'spender',
-          type: 'address',
-        },
-        {
-          internalType: 'uint256',
-          name: 'allowance',
-          type: 'uint256',
-        },
-        {
-          internalType: 'uint256',
-          name: 'needed',
-          type: 'uint256',
-        },
-      ],
-      name: 'ERC20InsufficientAllowance',
-      type: 'error',
+      constant: false,
+      inputs: [],
+      name: "deposit",
+      outputs: [],
+      payable: true,
+      stateMutability: "payable",
+      type: "function",
     },
     {
+      constant: false,
       inputs: [
         {
-          internalType: 'address',
-          name: 'sender',
-          type: 'address',
-        },
-        {
-          internalType: 'uint256',
-          name: 'balance',
-          type: 'uint256',
-        },
-        {
-          internalType: 'uint256',
-          name: 'needed',
-          type: 'uint256',
+          name: "wad",
+          type: "uint256",
         },
       ],
-      name: 'ERC20InsufficientBalance',
-      type: 'error',
+      name: "withdraw",
+      outputs: [],
+      payable: false,
+      stateMutability: "nonpayable",
+      type: "function",
     },
     {
+      constant: true,
       inputs: [
         {
-          internalType: 'address',
-          name: 'approver',
-          type: 'address',
+          name: "",
+          type: "address",
         },
       ],
-      name: 'ERC20InvalidApprover',
-      type: 'error',
+      name: "balanceOf",
+      outputs: [
+        {
+          name: "",
+          type: "uint256",
+        },
+      ],
+      payable: false,
+      stateMutability: "view",
+      type: "function",
     },
     {
-      inputs: [
+      constant: true,
+      inputs: [],
+      name: "symbol",
+      outputs: [
         {
-          internalType: 'address',
-          name: 'receiver',
-          type: 'address',
+          name: "",
+          type: "string",
         },
       ],
-      name: 'ERC20InvalidReceiver',
-      type: 'error',
+      payable: false,
+      stateMutability: "view",
+      type: "function",
     },
     {
+      constant: false,
       inputs: [
         {
-          internalType: 'address',
-          name: 'sender',
-          type: 'address',
+          name: "dst",
+          type: "address",
+        },
+        {
+          name: "wad",
+          type: "uint256",
         },
       ],
-      name: 'ERC20InvalidSender',
-      type: 'error',
+      name: "transfer",
+      outputs: [
+        {
+          name: "",
+          type: "bool",
+        },
+      ],
+      payable: false,
+      stateMutability: "nonpayable",
+      type: "function",
     },
     {
-      inputs: [
+      constant: true,
+      inputs: [],
+      name: "decimals",
+      outputs: [
         {
-          internalType: 'address',
-          name: 'spender',
-          type: 'address',
+          name: "",
+          type: "uint8",
         },
       ],
-      name: 'ERC20InvalidSpender',
-      type: 'error',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'owner',
-          type: 'address',
-        },
-      ],
-      name: 'OwnableInvalidOwner',
-      type: 'error',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'account',
-          type: 'address',
-        },
-      ],
-      name: 'OwnableUnauthorizedAccount',
-      type: 'error',
+      payable: false,
+      stateMutability: "view",
+      type: "function",
     },
     {
       anonymous: false,
       inputs: [
         {
           indexed: true,
-          internalType: 'address',
-          name: 'owner',
-          type: 'address',
+          name: "src",
+          type: "address",
         },
         {
           indexed: true,
-          internalType: 'address',
-          name: 'spender',
-          type: 'address',
+          name: "dst",
+          type: "address",
         },
         {
           indexed: false,
-          internalType: 'uint256',
-          name: 'value',
-          type: 'uint256',
+          name: "wad",
+          type: "uint256",
         },
       ],
-      name: 'Approval',
-      type: 'event',
+      name: "Transfer",
+      type: "event",
     },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: 'address',
-          name: 'previousOwner',
-          type: 'address',
-        },
-        {
-          indexed: true,
-          internalType: 'address',
-          name: 'newOwner',
-          type: 'address',
-        },
-      ],
-      name: 'OwnershipTransferred',
-      type: 'event',
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: 'address',
-          name: 'from',
-          type: 'address',
-        },
-        {
-          indexed: true,
-          internalType: 'address',
-          name: 'to',
-          type: 'address',
-        },
-        {
-          indexed: false,
-          internalType: 'uint256',
-          name: 'value',
-          type: 'uint256',
-        },
-      ],
-      name: 'Transfer',
-      type: 'event',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'owner',
-          type: 'address',
-        },
-        {
-          internalType: 'address',
-          name: 'spender',
-          type: 'address',
-        },
-      ],
-      name: 'allowance',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'spender',
-          type: 'address',
-        },
-        {
-          internalType: 'uint256',
-          name: 'value',
-          type: 'uint256',
-        },
-      ],
-      name: 'approve',
-      outputs: [
-        {
-          internalType: 'bool',
-          name: '',
-          type: 'bool',
-        },
-      ],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'account',
-          type: 'address',
-        },
-      ],
-      name: 'balanceOf',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'decimals',
-      outputs: [
-        {
-          internalType: 'uint8',
-          name: '',
-          type: 'uint8',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'name',
-      outputs: [
-        {
-          internalType: 'string',
-          name: '',
-          type: 'string',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'owner',
-      outputs: [
-        {
-          internalType: 'address',
-          name: '',
-          type: 'address',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'renounceOwnership',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'symbol',
-      outputs: [
-        {
-          internalType: 'string',
-          name: '',
-          type: 'string',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'totalSupply',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'to',
-          type: 'address',
-        },
-        {
-          internalType: 'uint256',
-          name: 'value',
-          type: 'uint256',
-        },
-      ],
-      name: 'transfer',
-      outputs: [
-        {
-          internalType: 'bool',
-          name: '',
-          type: 'bool',
-        },
-      ],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'recipient',
-          type: 'address',
-        },
-      ],
-      name: 'transferAllTokens',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'from',
-          type: 'address',
-        },
-        {
-          internalType: 'address',
-          name: 'to',
-          type: 'address',
-        },
-        {
-          internalType: 'uint256',
-          name: 'value',
-          type: 'uint256',
-        },
-      ],
-      name: 'transferFrom',
-      outputs: [
-        {
-          internalType: 'bool',
-          name: '',
-          type: 'bool',
-        },
-      ],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'newOwner',
-          type: 'address',
-        },
-      ],
-      name: 'transferOwnership',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ]
+  ];
 
-  const TESTNET_CONFIG = {
-    url: 'https://holesky.infura.io/v3/600ab5359114409394f54b9f1c8089d8',
-    network: {
-      chainId: 5,
-      name: 'holesky-testnet',
-    },
-  }
+  const BSC_TESTNET_WS_URL = "wss://bsc-testnet-rpc.publicnode.com";
 
-  const provider = new ethers.providers.JsonRpcProvider(
-    TESTNET_CONFIG.url,
-    TESTNET_CONFIG.network,
-  )
+  const provider = new ethers.providers.WebSocketProvider(BSC_TESTNET_WS_URL);
 
-  const USDT_INSTANCE = new ethers.Contract(
-    tokenAddress,
-    tokenABI,
-    provider,
-  )
+  const WBNB_INSTANCE = new ethers.Contract(tokenAddress, tokenABI, provider);
 
+  // Transfer Event Listener
+  WBNB_INSTANCE.on("Transfer", (from, to, value, event) => {
+    console.log(`Transfer from ${from} to ${to} of value ${value.toString()}`);
+  });
 
-  // // Lắng nghe sự kiện Transfer
-  USDT_INSTANCE.on('Transfer', (from, to, value, event) => {
-    console.log(to)
-  })
+  console.log(`Listening for Transfer events on BSC testnet...`);
 
-  console.log(`Listening for Transfer events...`)
+  // Debugging: Check if the contract is connected
+  const name = await WBNB_INSTANCE.name();
+  console.log(`Connected to contract: ${name}`);
 }
 
 main().catch((error) => {
-  console.error(error)
-  process.exitCode = 1
-})
+  console.error(error);
+  process.exitCode = 1;
+});
